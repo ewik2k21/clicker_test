@@ -1,0 +1,131 @@
+basePath: /
+definitions:
+  model.Banner:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  model.ClickStat:
+    properties:
+      banner_id:
+        type: string
+      count:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API server for count clicks
+  title: clickerCountApi
+  version: "1.0"
+paths:
+  /banners/random:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves 20 random banners with their IDs and names
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Banner'
+            type: array
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get 20 random banners
+      tags:
+      - banners
+  /counter/{bannerID}:
+    post:
+      consumes:
+      - application/json
+      description: Increments the click counter for the specified banner ID
+      parameters:
+      - description: Banner ID (UUID)
+        in: path
+        name: bannerID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a click for a banner
+      tags:
+      - clicks
+  /stats/{bannerID}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves click statistics for a banner within a time range
+      parameters:
+      - description: Banner ID (UUID)
+        in: path
+        name: bannerID
+        required: true
+        type: string
+      - description: Start timestamp (RFC3339)
+        in: query
+        name: tsFrom
+        required: true
+        type: string
+      - description: End timestamp (RFC3339)
+        in: query
+        name: tsTo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ClickStat'
+            type: array
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get click statistics for a banner
+      tags:
+      - stats
+schemes:
+- http
+swagger: "2.0"

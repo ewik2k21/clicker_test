@@ -1,0 +1,41 @@
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=clicks
+    command: sh -c "sleep 5 && ./click-counter"
+    networks:
+      - click-counter-net
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=clicks
+    ports:
+      - "5432:5432"
+    healthcheck:
+        test: [ "CMD-SHELL", "pg_isready -U user -d clicks" ]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+        start_period: 10s
+    networks:
+      - click-counter-net
+
+
+networks:
+  click-counter-net:
+    driver: bridge
